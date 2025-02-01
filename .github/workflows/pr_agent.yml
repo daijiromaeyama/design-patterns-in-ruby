@@ -28,6 +28,10 @@ jobs:
           OPENAI_KEY: ${{ secrets.PR_AGENT_OPENAI_KEY }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
+          GITHUB_ACTION.AUTO_DESCRIBE: true
+          GITHUB_ACTION.AUTO_REVIEW: true
+          GITHUB_ACTION.AUTO_IMPROVE: true
+
           # [config] セクションの設定
           CONFIG.MODEL: o1-mini
           CONFIG.GIT_PROVIDER: github
