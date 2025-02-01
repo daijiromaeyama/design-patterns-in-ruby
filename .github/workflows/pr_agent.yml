@@ -1,20 +1,59 @@
+name: PR Agent
+
 on:
-    pull_request:
-      types: [opened, reopened, ready_for_review]
-    issue_comment:
-  jobs:
-    pr_agent_job:
-      if: ${{ github.event.sender.type != 'Bot' }}
-      runs-on: ubuntu-latest
-      permissions:
-        issues: write
-        pull-requests: write
-        contents: write
-      name: Run pr agent on every pull request, respond to user comments
-      steps:
-        - name: PR Agent action step
-          id: pragent
-          uses: Codium-ai/pr-agent@main
-          env:
-            OPENAI_KEY: ${{ secrets.OPENAI_KEY }}
-            GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+  pull_request:
+    types: ["ready_for_review"]
+  issue_comment:
+    types: [created]
+
+jobs:
+  pr_agent_job:
+    if: ${{ github.event.sender.type != 'Bot' }}
+    runs-on: ubuntu-latest
+    permissions:
+      issues: write
+      pull-requests: write
+      contents: write
+    name: Run pr agent on every pull request, respond to user comments
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: PR Agent action step
+        id: pragent
+        uses: qodo-ai/pr-agent@main
+        env:
+          OPENAI_KEY: ${{ secrets.PR_AGENT_OPENAI_KEY }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+          # [config] セクションの設定
+          CONFIG.MODEL: o1-mini
+          CONFIG.GIT_PROVIDER: github
+          CONFIG.IGNORE_PR_LABELS: '["renovate"]'
+          CONFIG.PATCH_EXTENSION_SKIP_TYPES: '[]'
+
+          # [github_app] セクションの設定
+          GITHUB_APP.PR_COMMANDS: '["/describe", "/review", "/improve"]'
+
+          # [pr_description] セクションの設定 (/describe)
+          PR_DESCRIPTION.PUBLISH_LABELS: "false"
+          PR_DESCRIPTION.EXTRA_INSTRUCTIONS: |
+            Emphasize the following:
+            - Please use Japanese for everything.
+
+          # [pr_reviewer] セクションの設定 (/review)
+          PR_REVIEWER.REQUIRE_SCORE_REVIEW: "false"
+          PR_REVIEWER.ENABLE_REVIEW_LABELS_EFFORT: "false"
+          PR_REVIEWER.PERSISTENT_COMMENT: "true"
+          PR_REVIEWER.FINAL_UPDATE_MESSAGE: "true"
+          PR_REVIEWER.EXTRA_INSTRUCTIONS: |
+            Emphasize the following:
+            - Please use Japanese for everything.
+
+          # [pr_code_suggestions] セクションの設定 (/improve)
+          PR_CODE_SUGGESTIONS.PERSISTENT_COMMENT: "true"
+          PR_CODE_SUGGESTIONS.EXTRA_INSTRUCTIONS: |
+            Emphasize the following:
+            - Please use Japanese for everything.
