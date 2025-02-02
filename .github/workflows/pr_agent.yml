@@ -2,7 +2,7 @@ name: PR Agent
 
 on:
   pull_request:
-    types: ["ready_for_review"]
+    types: [opened, ready_for_review]
   issue_comment:
     types: [created]
 
@@ -32,22 +32,24 @@ jobs:
           GITHUB_ACTION.AUTO_REVIEW: true
           GITHUB_ACTION.AUTO_IMPROVE: true
 
-          # [config] セクションの設定
+          # cf: https://github.com/qodo-ai/pr-agent/blob/main/pr_agent/settings/configuration.toml
+          #
+          # [config] の設定
           CONFIG.MODEL: o1-mini
           CONFIG.GIT_PROVIDER: github
           CONFIG.IGNORE_PR_LABELS: '["renovate"]'
-          CONFIG.PATCH_EXTENSION_SKIP_TYPES: '[]'
+          CONFIG.PATCH_EXTENSION_SKIP_TYPES: '[]' # スキップしたいファイルの拡張子を指定する
 
-          # [github_app] セクションの設定
+          # [github_app] の設定
           GITHUB_APP.PR_COMMANDS: '["/describe", "/review", "/improve"]'
 
-          # [pr_description] セクションの設定 (/describe)
+          # [pr_description] の設定 (/describe)
           PR_DESCRIPTION.PUBLISH_LABELS: "false"
           PR_DESCRIPTION.EXTRA_INSTRUCTIONS: |
             Emphasize the following:
             - Please use Japanese for everything.
 
-          # [pr_reviewer] セクションの設定 (/review)
+          # [pr_reviewer] の設定 (/review)
           PR_REVIEWER.REQUIRE_SCORE_REVIEW: "false"
           PR_REVIEWER.ENABLE_REVIEW_LABELS_EFFORT: "false"
           PR_REVIEWER.PERSISTENT_COMMENT: "true"
@@ -56,7 +58,7 @@ jobs:
             Emphasize the following:
             - Please use Japanese for everything.
 
-          # [pr_code_suggestions] セクションの設定 (/improve)
+          # [pr_code_suggestions] の設定 (/improve)
           PR_CODE_SUGGESTIONS.PERSISTENT_COMMENT: "true"
           PR_CODE_SUGGESTIONS.EXTRA_INSTRUCTIONS: |
             Emphasize the following:
